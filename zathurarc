@@ -1,0 +1,26 @@
+# set the default buffer to copy to
+set selection-clipboard clipboard
+
+# zoom
+map z zoom in
+map Z zoom out
+
+# Set color for dark mode
+map <C-i> recolor 
+set recolor_darkcolor #BDE090
+set recolor_lightcolor #000000
+
+# style
+set statusbar-h-padding 0
+set statusbar-v-padding 0
+set page-padding 1
+
+# movement
+map u scroll half-up
+map d scroll half-down
+map [presentation] n navigate previous
+map [presentation] m navigate next
+map D toggle_page_mode
+map r reload
+map R rotate
+

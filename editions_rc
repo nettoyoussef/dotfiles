@@ -1,0 +1,25 @@
+
+### Elias editions
+
+# Show hidden files? You can toggle this by typing 'zh'
+set show_hidden true
+
+# Use one of the supported image preview protocols
+set preview_images true
+
+# map home commands
+map gh cd ~/ssd_sata
+map gz cd ~/.config/ranger/
+
+# quick editing source
+map X chain shell vim -p ~/.config/ranger/rc.conf; source ~/.config/ranger/rc.conf
+map Z chain shell vim -p ~/.config/ranger/rifle.conf; source ~/.config/ranger/rifle.conf
+
+# quick jumping around :)
+map cj console j%space
+
+# smart cw
+map cw eval fm.execute_console("bulkrename") if fm.thisdir.marked_items else fm.open_console("rename ")
+map DD shell mv %s /home/eliasy/.local/share/Trash/files/
+
+### end

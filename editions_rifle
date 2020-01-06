@@ -1,0 +1,4 @@
+ext r, flag f = rstudio "$1"
+ext rmd, flag f =  rstudio "$1"
+ext tex = texmaker -- "$1"
+ext csv, flag f =  libreoffice "$1" &
