@@ -1,0 +1,296 @@
+# check network interface
+ip link
+
+
+
+#Check internet connection
+ping google.com
+
+# organiza conexao wifi
+wifi-menu
+
+# checa particoes
+fdisk -l
+
+# cfdisk /dev/sda mostra as particoes de uma forma mais grafica
+
+# formata a particao no file system escolhido - checar o caminho do disco
+mkfs.ext4 /dev/nvme0n1p3
+
+
+# Para criar particoes numa instalacao virgem
+# fdisk /path/to/hardware (normalmente /dev/sda1)
+# n - cria nova particao
+# p - transforma particao em primaria
+# escolha tamanho das particoes usando: + tamanho unidade. Ex: +10G.
+# No final, salve usando: w
+
+# Depois monte e aloque cada uma das particoes.
+# 1) formate e escolha sistema de arquivos:
+# mkfs.ext4 /dev/sda1
+# mkfs.ext4 /dev/sda2
+# mkswap    /dev/sda3
+
+# 2) monte os caminhos dos diretorios
+# mount /dev/sda1 /mnt
+# mkdir /mnt/home
+# mount /dev/sda2 /mnt/home
+# swapon /dev/sda3
+
+# montar as particoes no local correto
+# formata e monta root
+mkfs.ext4 /dev/nvme0n1p3 
+mount  /dev/nvme0n1p3 /mnt
+
+# formata e monta o swap
+mkswap /dev/nvme0n1p1
+swapon /dev/nvme0n1p1 
+
+# formata e monta efi 
+mkfs.fat -F32 /dev/nvme0n1p2
+mkdir -p /mnt/boot/efi
+mount  /dev/nvme0n1p2 /mnt/boot/efi
+
+# monta home
+mkdir /mnt/home
+mount  /dev/sda1      /mnt/home
+
+# To see all partitions created
+lsblk
+
+# instalando o arch
+pacstrap /mnt base base-devel linux linux-firmware gvim 
+
+# gera o arquivo de particoes para o sistema
+genfstab -U -p /mnt >> /mnt/etc/fstab
+
+# conferindo o arquivo
+cat /mnt/etc/fstab
+
+# entrando no sistema
+arch-chroot /mnt
+
+# configurando hora e tempo
+ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+
+# gerando clock da bios
+hwclock --systohc
+
+# configurando o encoding do sistema
+vim /etc/locale.gen
+locale-gen
+echo "LANG=en_US.UTF-8" >> /etc/locale.conf
+
+# cria o hostname e rede local
+echo "me" >> /etc/hostname
+echo "127.0.0.1    localhost.localdomain    localhost
+::1           localhost.localdomain    localhost
+127.0.1.1     me.localdomain           me" >> /etc/hosts
+
+# configura password
+passwd
+
+# adicionando usuario
+#useradd -m -q users -G wheel eliasy
+useradd -m -g users -G wheel,storage,power -s /bin/bash eliasy 
+
+# senha do usuario
+passwd eliasy
+
+# adiciona pacotes
+pacman -S dosfstools                \
+          os-prober                 \
+          mtools                    \
+          network-manager-applet    \
+          networkmanager            \
+          wpa_supplicant            \
+          wireless_tools            \
+          dialog                    \
+          sudo                      
+
+# adiciona usuario na lista de sudoers
+echo "eliasy ALL=(ALL) ALL" >> /etc/sudoers
+
+# cria a home - apenas se ja nao existir antes
+# mkdir /home/eliasy
+
+# configura a home para o usuario
+#usermod -d /home/eliasy/ -m eliasy
+
+
+#Versao BIOS
+# pacman -S grub
+# grub-install --target=i386-pc --recheck /dev/sda
+# mkdir /boot/grub/locale
+# cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
+
+# Versao UEFI
+
+# instalando o grup (o arquivo de boot)
+pacman -S grub-efi-x86_64 efibootmgr
+
+grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=arch_grub --recheck
+
+cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
+
+
+# Gera arquivo de configuracoes do boot
+
+grub-mkconfig -o /boot/grub/grub.cfg
+
+# Reinicie o computador e boot o arch
+exit
+reboot
+
+##
+# instalando os pacotes e ambiente de trabalho
+
+# conecte-se a internet
+wifi-menu
+systemctl status NetworkManager
+systemctl start NetworkManager
+
+# atualizando o sistema
+# archnews -b -r -n 1 # necessita do pacote AUR archnews2
+pacman -Syu
+
+# instalando o ambiente grafico
+pacman -S xorg
+
+# drivers de video
+#pacman -S nvidia nvidia-libgl mesa
+pacman -S nvidia-dkms nvidia-libgl mesa # apparently dkms recompiles with every change of kernel,so it is safer.
+
+# versao para maquina virtual
+# pacman -S virtualbox-guest-utils virtualbox-guest-modules-arch mesa mesa-libgl
+
+# updating the config for the nvidia driver and xorg according to:
+# https://wiki.archlinux.org/index.php/NVIDIA_Optimus#Use_NVIDIA_graphics_only
+
+
+
+# outros programas
+pacman -S firefox \ # browser
+          alsa-utils \ # audio driver
+	  zsh \
+	  git \
+	  curl \
+	  zathura zathura-djvu zathura-pdf-mupdf \ # pdf reader
+	  conky \ # system status displayer
+	  fzf \   # fuzzy finder
+	  gparted \ 
+	  redshift \ 
+	  poppler \ # pdf tools 
+	  i3-gaps \ # window manager
+	  rsync \
+	  calibre \
+	  youtube-dl \
+	  vlc \
+	  libreoffice-fresh \
+	  openssh \ 
+	  networkmanager-openvpn \
+	  openvpn \
+	  p7zip \
+	  zip \
+	  ark \
+	  lz4 \
+	  thunderbird \ # email program
+	  kdeconnect \
+	  docker \
+	  docker-compose \
+	  nvidia-container-toolkit \
+	  pulseaudio \ # audio utility - control volume
+	  jdk11-openjdk \
+	  \ #xorg-xbacklight \ # control screen brightness
+	  \ # specific programs for i3
+	  light          \ # control screen brightness
+	  rofi           \ # dmenu replacement and utility launcher
+	  feh            \ # wallpaper setter
+	  python-pywal   \ # sets colors in terminal according to wallpaper
+	  \ # end
+          xorg-server    \ # is the graphical server.
+          xorg-xwininfo  \ # allows querying information about windows.
+          xorg-xinit     \ # starts the graphical server. 
+          xorg-minimal   \ # is the graphical server. 
+          xorg-fonts     \ # is a font package.
+	  xorg-xclipboard \ # manages clipboard
+          ranger-git     \ # is an extensive terminal file manager that everyone likes.
+          xcompmgr       \ # is for transparency and removing screen-tearing.
+          xorg-xprop     \ # is a tool for detecting window properties.
+          ffmpeg         \ # can record and splice video and audio on the command line.
+          xorg-xdpyinfo  \ # aids with resolution determination and screen recording.
+          xdpyinfo       \ # aids with resolution determination and screen recording.
+          xorg-xmodmap   \ # Utility for modifying keymaps and button mappings
+	  xbindkeys      \ # maybe needed for special keyboard keys
+	  neofetch       \ # to show the ricing on unixporn :)
+	  cmatrix        \ # to show the ricing on unixporn :)
+
+	  
+# Install Yay to use the AUR
+cd /tmp
+git clone https://aur.archlinux.org/yay.git
+cd yay
+makepkg -si
+
+# Install AUR packages
+sudo yay -Syu \
+     polybar        \ # i3status replacement
+
+echo "exec i3-gaps" >> ~/.xinitrc
+
+# to see which keyboard mappings are available do:
+# xmodmap -pke
+
+
+
+
+# add config for xorg backlight
+echo 'Section "Device"
+    Identifier "Card0"
+    Driver "intel"
+    Option "Backlight" "intel_backlight"
+EndSection' >> /etc/X11/xorg.conf
+
+
+
+##
+# echo cancelling
+# editar arquivo do pulseaudio
+# http://forums.debian.net/viewtopic.php?t=128306
+sudo echo "load-module module-echo-cancel aec_method=webrtc" >> /etc/pulse/default.pa
+# acrescentar no final
+#load-module module-echo-cancel aec_method=webrtc source_name=noechosource sink_name=noechosink
+#set-default-source noechosource
+#set-default-sink noechosink
+
+# Depois abrir o alsamixer, selecionar o canal do mic e garantir que ele nao esteja mutado (mm). caso esteja, aperte 'm' e aumente o ganho do canal.
+# caso ainda nao funcione, tente reinstalar os drivers
+# sudo apt-get remove --purge alsa-base pulseaudio
+# sudo apt-get install alsa-base pulseaudio    
+# depois, va em sounds, allow over-amplification
+
+##
+# instala oh my zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+##
+# instala powerlevel9k theme para zsh
+git clone https://github.com/bhilburn/powerlevel9k.git ~/.oh-my-zsh/custom/themes/powerlevel9k
+
+
+          
+# unmuting the channels
+amixer sset Master unmute
+amixer sset Speaker unmute
+amixer sset Headphone unmute          
+amixer sset Mic  unmute          
+
+# habilitando a internet permanentemente
+systemctl enable NetworkManager
+
+# firefox edits
+# para habilitar fullscreen numa tiling window
+# about:config
+# full-screen-api.ignore.widgets = true
+
+

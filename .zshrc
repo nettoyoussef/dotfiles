@@ -141,6 +141,30 @@ setopt listtypes
 #bindkey "\e," _history-complete-newer
 #zle -N no-magic-abbrev-expand
 
+
+
+
+##
+# pywal colors for the terminal
+# Import colorscheme from 'wal' asynchronously
+# &   # Run the process in the background.
+# ( ) # Hide shell job control messages.
+
+
+# Add local 'pip' to PATH:
+# (In your .bashrc, .zshrc etc)
+export PATH="${PATH}:${HOME}/.local/bin/"
+
+(cat ~/.cache/wal/sequences &)
+
+# Alternative (blocks terminal for 0-3ms)
+cat ~/.cache/wal/sequences
+
+# To add support for TTYs this line can be optionally added.
+source ~/.cache/wal/colors-tty.sh
+##
+
+
 p () {
     open=xdg-open   # this will open pdf file withthe default PDF viewer on KDE, xfce, LXDE and perhaps on other desktops.
 

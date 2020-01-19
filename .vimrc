@@ -16,13 +16,15 @@ if v:progname =~? "evim"
 endif
 
 " Get the defaults that most users want.
-source $VIMRUNTIME/defaults.vim
+"source $VIMRUNTIME/defaults.vim
 
 " create clipboard from vim to other applications
 set clipboard=unnamedplus
 
 " use relative numbers to make walking around easier
 set relativenumber
+" show absolute number of current line
+set number
 
 " split new screens below and to the right of the current screen
 set splitbelow
@@ -59,16 +61,16 @@ if has("autocmd")
 
 else
 
-  set autoindent		" always set autoindenting on
+  set autoindent " always set autoindenting on
 
 endif " has("autocmd")
 
-" Add optional packages.
-"
-" The matchit plugin makes the % command work better, but it is not backwards
-" compatible.
-" The ! means the package won't be loaded right away but when plugins are
-" loaded during initialization.
-if has('syntax') && has('eval')
-  packadd! matchit
-endif
+" Add plugins - controlled by vim-plug
+call plug#begin()
+Plug 'tpope/vim-sensible'
+Plug 'adelarsq/vim-matchit'
+Plug 'jalvesaq/Nvim-R'
+call plug#end()
+
+
+
