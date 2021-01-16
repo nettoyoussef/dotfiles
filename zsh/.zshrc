@@ -1,5 +1,19 @@
+## fix for tramp
+# https://emacs.stackexchange.com/questions/47969/trouble-connecting-gnu-emacs-to-work-machine-through-ssh-tramp?rq=1
+if [[ "$TERM" == "dumb" ]]; then
+   unsetopt zle
+   unsetopt prompt_cr
+   unsetopt prompt_subst
+   unfunction precmd
+   unfunction preexec
+   PS1='$ '
+   return
+fi
+
+
 # Path to your oh-my-zsh installation.
 export ZSH="/home/eliasy/.oh-my-zsh"
+export TERM="xterm-256color"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -54,24 +68,36 @@ export PGHOST=localhost
 export QT_QPA_PLATFORMTHEME=qt5ct
 
 # files
-alias vimrc="vim ~/.vimrc"
-alias zshrc="vim ~/.zshrc"
+alias r="ranger"
+alias vimrc="vim ~/project_repositories/dotfiles/vim/.vimrc"
+alias zshrc="vim ~/project_repositories/dotfiles/zsh/.zshrc"
 #alias tmux.conf='vim ~/.tmux.conf'
-alias i3c='vim ~/.config/i3/config'
-alias zathurarc='vim ~/.config/zathura/zathurarc'
-alias rc='vim ~/.config/ranger/rc.conf'
-alias rifle='vim ~/.config/ranger/rifle.conf'
+alias i3='vim ~/project_repositories/dotfiles/i3/i3.config'
+alias arch='vim ~/project_repositories/dotfiles/arch_linux'
+alias zathurarc='vim ~/project_repositories/dotfiles/zathurarc'
+alias rc='vim ~/project_repositories/dotfiles/ranger/rc.conf'
+alias rifle='vim ~/project_repositories/dotfiles/ranger/rifle.conf'
+alias py='source ~/eliasy_env/bin/activate; python'
+alias cedro_tunnel='ssh -L localhost:9000:localhost:8787 eliasy@cedro.lbic.fee.unicamp.br'
+alias transcribe='wine "C:\\Program Files (x86)\\Transcribe\!\\Transcribe.exe"'
 
 #Configuracao do Gurobi
 export GUROBI_HOME="/opt/gurobi811/linux64"
 export PATH="${PATH}:${GUROBI_HOME}/bin"
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${GUROBI_HOME}/lib"
 
+#Configuracao texlive
+export PATH=/usr/local/texlive/2019/bin/x86_64-linux:$PATH
+
 #Configuracao ranger
 export EDITOR=vim
 #export TERMCMD=konsole
 export TERMCMD=gnome-terminal
-alias ranger='ranger --choosedir = /home/eliasy/'
+alias ranger='ranger' # --choosedir = /home/eliasy/'
+
+# Blocks telemetry from Microsoft on VScode
+export DOTNET_CLI_TELEMETRY_OPTOUT=1
+
 
 # softwares
 alias yt='youtube-dl'
@@ -165,6 +191,32 @@ source ~/.cache/wal/colors-tty.sh
 ##
 
 
+# Functions
+
+# Rsync fast
+rsync_from(){
+rsync --ignore-existing --protect-args --partial -azze ssh --info=progress2 --log-file=/home/eliasy/Desktop/backup.log "eliasy@cedro:/home/eliasy/$1" "$2"
+}
+
+rsync_from_zpool(){
+rsync --ignore-existing --protect-args --partial -azze ssh --info=progress2 --log-file=/home/eliasy/Desktop/backup.log "eliasy@cedro:/home/eliasy/zpool/backup_1/$1" "$2"
+}
+
+
+rsync_to(){
+rsync --ignore-existing --protect-args --partial -azze ssh --info=progress2 --log-file=/home/eliasy/Desktop/backup.log "$1" "eliasy@cedro:/home/eliasy/$2" 
+}
+
+rsync_to_zpool(){
+rsync --ignore-existing --protect-args --partial -azze ssh --info=progress2 --log-file=/home/eliasy/Desktop/backup.log "$1" "eliasy@cedro:/home/eliasy/zpool/backup_1/$2" 
+}
+
+# fast grep
+fgrep(){
+find ./ -print0 | xargs -0 -r grep -s "$1"
+}
+
+# Scan pdfs fast
 p () {
     open=xdg-open   # this will open pdf file withthe default PDF viewer on KDE, xfce, LXDE and perhaps on other desktops.
 
@@ -177,3 +229,24 @@ p () {
         ' \
     | cut -z -f 1 -d $'\t' | tr -d '\n' | xargs -r --null $open > /dev/null 2> /dev/null
 }
+
+
+# For emacs vterm
+vterm_printf(){
+    if [ -n "$TMUX" ]; then
+        # Tell tmux to pass the escape sequences through
+        # (Source: http://permalink.gmane.org/gmane.comp.terminal-emulators.tmux.user/1324)
+        printf "\ePtmux;\e\e]%s\007\e\\" "$1"
+    elif [ "${TERM%%-*}" = "screen" ]; then
+        # GNU screen (screen, screen-256color, screen-256color-bce)
+        printf "\eP\e]%s\007\e\\" "$1"
+    else
+        printf "\e]%s\e\\" "$1"
+    fi
+}
+
+fscan(){
+scanimage --device "fujitsu:fi-6140dj:23316" --format=png --progress --source "ADF Duplex" --batch --mode Gray --page-width 210 --page-height 270 --resolution 300
+}
+
+

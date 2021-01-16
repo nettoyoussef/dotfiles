@@ -101,11 +101,13 @@ passwd eliasy
 pacman -S dosfstools                \
           os-prober                 \
           mtools                    \
-          network-manager-applet    \
-          networkmanager            \
+	  # netctl                    \ # internet, wifi-menu
+          # network-manager-applet    \
+          # networkmanager            \
           wpa_supplicant            \
-          wireless_tools            \
+          iw                        \
           dialog                    \
+	  # dhcpcd                    \ # conflita com o network manager
           sudo                      
 
 # adiciona usuario na lista de sudoers
@@ -171,11 +173,14 @@ pacman -S nvidia-dkms nvidia-libgl mesa # apparently dkms recompiles with every 
 
 # outros programas
 pacman -S firefox \ # browser
+	  libinput \ # to control touchpad smartly
           alsa-utils \ # audio driver
 	  zsh \
 	  git \
 	  curl \
-	  zathura zathura-djvu zathura-pdf-mupdf \ # pdf reader
+	  zathura zathura-djvu \ # djvu reader
+	  #zathura-pdf-mupdf \ # pdf reader using the mupdf engine - currently presents some search problems in some pdfs - see https://git.pwmt.org/pwmt/zathura/issues/126
+	  zathura-pdf-poppler \ # pdf reader using the poppler engine
 	  conky \ # system status displayer
 	  fzf \   # fuzzy finder
 	  gparted \ 
@@ -203,10 +208,14 @@ pacman -S firefox \ # browser
 	  jdk11-openjdk \
 	  \ #xorg-xbacklight \ # control screen brightness
 	  \ # specific programs for i3
-	  light          \ # control screen brightness
+	  # light          \ # control screen brightness # passei a usar xrandr
 	  rofi           \ # dmenu replacement and utility launcher
 	  feh            \ # wallpaper setter
 	  python-pywal   \ # sets colors in terminal according to wallpaper
+	  arandr         \ # GUI program to set multiple monitors
+          picom          \ # is for transparency and removing screen-tearing.
+          ranger         \ # is an extensive terminal file manager that everyone likes.
+	  w3m            \ # preview images in Ranger
 	  \ # end
           xorg-server    \ # is the graphical server.
           xorg-xwininfo  \ # allows querying information about windows.
@@ -214,8 +223,6 @@ pacman -S firefox \ # browser
           xorg-minimal   \ # is the graphical server. 
           xorg-fonts     \ # is a font package.
 	  xorg-xclipboard \ # manages clipboard
-          ranger-git     \ # is an extensive terminal file manager that everyone likes.
-          xcompmgr       \ # is for transparency and removing screen-tearing.
           xorg-xprop     \ # is a tool for detecting window properties.
           ffmpeg         \ # can record and splice video and audio on the command line.
           xorg-xdpyinfo  \ # aids with resolution determination and screen recording.
@@ -224,7 +231,110 @@ pacman -S firefox \ # browser
 	  xbindkeys      \ # maybe needed for special keyboard keys
 	  neofetch       \ # to show the ricing on unixporn :)
 	  cmatrix        \ # to show the ricing on unixporn :)
+	  texmaker       \ # tex editor (until I get used to the vim plugin)
+	  lxappearance-gtk3   \ # to control appearance of gtk programs
+	  arc-gtk-theme  \ # arch theme
+	  deepin-gtk-theme \ # dark theme I use 
+	  gtk-chtheme    \ # other program that controls themes for applications
+	  qt4-qtconfig   \ # another one that control themer for other apps
+	  xournalpp      \ # edit and sign pdfs
+	  mpd            \ # music player daemon
+	  ncmpcpp        \ # client for mpd
+	  wget           \ # with curl, the best way to download something
+	  flameshot          \ # for screenshots
+          ttf-font-awesome
+	  ttf-opensans
+	  ttf-roboto
+	  ttf-roboto-mono
+	  ttf-ubuntu-font-family \ # install common fonts
+	  emacs          \ # the OS editor
+	  gtk2 \ # required by warsaw-bin
+	  nvidia-settings \ # to help configure nvidia driver
+	  kdeconnect \ # tool for browsing android files
+	  pandoc     \ # tool for convertgin markdown to pdf, html and much more
+	  pandoc-citeproc \ # tool to make pandoc handle bibtex references
+	  pandoc-crossref \ # tool to help cross-links for pandoc exports
+	  pacman-contrib \  # clean cache for pacman downloads
+	  blueman # a bluetooth manager that actually works
+	  xclip \ # access clipboard, used by inkscape shortcut manager
+	  aspell \ # spell checker for emacs
+	  aspell-en \ # spell checker for emacs
+	  languagetool \ #spell checker for emacs
+	  rmlint \ # tool for duplicate file removal
+	  smartmontools \ # smart suite software to test life of disks
+	  remmina \ # tool for accessing remote desktop env.
+	  freerdp \ # tool for accessing remote desktop env.
+	  libvncserver \ # tool for accessing remote desktop env.
+          ffmpegthumbnailer \ # for previewing video thumbnails with ranger
+          dmidecode \ #shows notebook/hardware model, information
+	  wine \ # to run transcribe
+          lib32-libpulse \ # to use audio with wine
+	  lib32-alsa-lib \ # to use audio with wine
+	  lib32-alsa-plugins \ # to use audio with wine
+          lib32-nvidia-utils \ # to support 32 bit video applications
+          alacritty \ # kitty backup
+          namcap    \ # to check for AUR package builds
+          #dpkg      \ # to convert deb packages to tar
+	  # better to use debtap
+          uchardet  \ # to check enconding of files
+          enca      \ # to check enconding of files
+          recoll    \ # full search on desktop
+          docfetcher \ # full search on desktop
+          ripgrep    \ # full search on desktop
+          ripgrep-all \ # full search on desktop
+          tldr  \ # better man pages - requires pip install tldr
+	  sane \ # to be able to use scanners with linux
+          
 
+
+
+
+# Configura openvpn para o lbic
+cd ~/Downloads/Lbic_vpn/ovpn-eliasy
+nmcli connection import type openvpn file eliasy.ovpn
+# para ativar conexao
+# nmcli connection up eliasy
+
+
+
+# instala zoom - conference app
+sudo pacman -U ~/Downloads/Zoom/zoom_x86_64.pkg.tar.xz
+
+	  
+# install latex packages (texlive dist)
+#pacman -Ssq texlive | sudo pacman -S -
+# Abandonei as distribuicoes automaticas agora do arch e to instalando o texlive direto do TUG
+# Passos:
+# 1 Baixar instalador, untar (tar -zxvf)
+# 2 sudo perl ./install.. -gui text 
+# 3 escolher pacotes pra instalar 
+# $ demora pacas, entao esperar
+# vale a pena mudar o mirror para o lugar mais proximo
+# sudo tlmgr option repository http://linorg.usp.br/CTAN/systems/texlive/tlnet
+# sudo tlmgr install scheme-full
+# Alternativamente:
+# sudo tlmgr update --self --all
+
+
+# correcting defaults from libinput
+# #check device with libinput list-devices and xinput list-props *device_name*
+# xinput set-prop 16 273 1 # tap to click
+# xinput set-prop 16 269 1 # natural scrolling
+# Para tornar as mudancas definitivas faca o upload do arquivo de 
+# configuracoes 40-libinput.conf no caminho 
+# /usr/share/X11/xorg.conf.d/
+
+# add user to the docker group
+sudo gpasswd -a $USER docker
+systemctl enable docker
+systemctl start docker
+
+
+# show available shells
+# chsh -l
+
+# Change default shell to zsh
+# chsh -s /bin/zsh
 	  
 # Install Yay to use the AUR
 cd /tmp
@@ -233,15 +343,43 @@ cd yay
 makepkg -si
 
 # Install AUR packages
-sudo yay -Syu \
+yay -Syu       \
      polybar        \ # i3status replacement
+     # you may have to recompile polybar after upgrading the system
+     # basically, you have to do: yay -S polybar
+     # details:
+     # https://github.com/polybar/polybar/issues/885
+     autojump       \ # move to directory faster in ranger or cli
+     timeshift      \ # automate system backups to avoid downtime
+     nvidia-container-toolkit \ # needed to run docker on gpus
+     zotero         \ # bibliography manager
+     # texlive-localmanager-git \ # updates tex packages # package doesnt build
+     visual-studio-code-bin \ # unfortunatelly, most complete IDE in existence
+     debtap      \ # to convert deb packages in arch packages
+     warsaw-bin   \ # aplicativo para acessar internet banking
+     # sobre o warsaw veja tambem
+     # https://www.vivaolinux.com.br/dica/Modulo-de-Seguranca-Warsaw-da-Caixa-no-Arch-Linux/
+     storageexplorer \ # Azure AUR package (non-official) to access the datasets on the cloud
+     unclutter-xfixes-git \ # hides mouse when not using it
+     emacs-pdf-tools-git # nice visualization of pdfs inside emacs
+     sdcv \ # utility to accessing dictionaries in star format, such as Webster (I use it with emacs)
+     drawio-desktop-bin \ # utility for drawing diagrams
+     libmatheval \ # for gbutils to work
+     subbotools \ # AEP fits 
+     gbutils    \ # Giulio Bottazzi's Command Line Econometrics 
+     debtap \ # to convert deb packages to tar for AUR
 
 echo "exec i3-gaps" >> ~/.xinitrc
 
 # to see which keyboard mappings are available do:
 # xmodmap -pke
 
-
+# inicializando debtap para instalacao do warsaw
+# (nao funcionou)
+# sudo debtap -u
+# cd ~/Downloads/modulo\ seguranca\ bancos/warsaw_setup64.deb
+# debtap warsaw_setup64.deb
+# sudo pacman -U warsaw-1.13.1-1-x86_64.pkg.tar.xz  
 
 
 # add config for xorg backlight
@@ -293,4 +431,11 @@ systemctl enable NetworkManager
 # about:config
 # full-screen-api.ignore.widgets = true
 
+# kdeconnect editions
+# for iptables firewall
+sudo iptables -I INPUT -i wlp2s0 -p udp --dport 1714:1764 -m state --state NEW,ESTABLISHED -j ACCEPT
+sudo iptables -I INPUT -i wlp2s0 -p tcp --dport 1714:1764 -m state --state NEW,ESTABLISHED -j ACCEPT
 
+sudo iptables -A OUTPUT -o wlp2s0 -p udp --sport 1714:1764 -m state --state NEW,ESTABLISHED -j ACCEPT
+sudo iptables -A OUTPUT -o wlp2s0 -p tcp --sport 1714:1764 -m state --state NEW,ESTABLISHED -j ACCEPT
+# to launch, temporarily, one can use dbus-launch kdeconnect-settings

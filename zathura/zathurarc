@@ -6,9 +6,11 @@ map z zoom in
 map Z zoom out
 
 # Set color for dark mode
+set recolor-darkcolor "#BFBFBF"
+#set recolor-lightcolor "#121212"
+set recolor-lightcolor "#212121"
+#set recolor "true"
 map <C-i> recolor 
-set recolor_darkcolor #BDE090
-set recolor_lightcolor #000000
 
 # style
 set statusbar-h-padding 0

@@ -1,0 +1,12 @@
+configuration {
+lines: 5;
+eh: 2 ;
+width: 100;
+padding: 800;
+opacity: "85";
+theme: "mytheme";
+font: "monospace 8";
+bc: "#222";
+fg: "#dfdfdf";
+}
+

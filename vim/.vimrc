@@ -26,6 +26,9 @@ set relativenumber
 " show absolute number of current line
 set number
 
+" ignore case in searches
+set ignorecase
+
 " split new screens below and to the right of the current screen
 set splitbelow
 set splitright
@@ -68,9 +71,11 @@ endif " has("autocmd")
 " Add plugins - controlled by vim-plug
 call plug#begin()
 Plug 'tpope/vim-sensible'
+Plug 'tpope/vim-surround'
 Plug 'adelarsq/vim-matchit'
 Plug 'jalvesaq/Nvim-R'
+Plug 'dylanaraps/wal.vim'
 call plug#end()
 
-
+colorscheme wal
 
