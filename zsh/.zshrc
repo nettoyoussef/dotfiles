@@ -45,7 +45,7 @@ POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context custom_flame_icon dir vcs)
 # ZSH_CUSTOM=/path/to/new-custom-folder
 
 # Use ~~ as the trigger sequence instead of the default **
-export FZF_COMPLETION_TRIGGER=',,'
+export FZF_COMPLETION_TRIGGER='**'
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # Which plugins would you like to load?
@@ -79,7 +79,7 @@ alias rc='vim ~/project_repositories/dotfiles/ranger/rc.conf'
 alias rifle='vim ~/project_repositories/dotfiles/ranger/rifle.conf'
 alias py='source ~/eliasy_env/bin/activate; python'
 alias cedro_tunnel='ssh -L localhost:9000:localhost:8787 eliasy@cedro.lbic.fee.unicamp.br'
-alias transcribe='wine "C:\\Program Files (x86)\\Transcribe\!\\Transcribe.exe"'
+alias transcribe='wine "/home/eliasy/.wine/drive_c/Program Files (x86)/Transcribe!/Transcribe.exe"'
 
 #Configuracao do Gurobi
 export GUROBI_HOME="/opt/gurobi811/linux64"
@@ -195,20 +195,21 @@ source ~/.cache/wal/colors-tty.sh
 
 # Rsync fast
 rsync_from(){
-rsync --ignore-existing --protect-args --partial -azze ssh --info=progress2 --log-file=/home/eliasy/Desktop/backup.log "eliasy@cedro:/home/eliasy/$1" "$2"
+# --ignore-existing - removed to avoid partial transfer to be reconnected
+rsync  --protect-args --partial -azze ssh --info=progress2 --log-file=/home/eliasy/Desktop/backup.log "eliasy@cedro:/home/eliasy/$1" "$2"
 }
 
 rsync_from_zpool(){
-rsync --ignore-existing --protect-args --partial -azze ssh --info=progress2 --log-file=/home/eliasy/Desktop/backup.log "eliasy@cedro:/home/eliasy/zpool/backup_1/$1" "$2"
+rsync --protect-args --partial -azze ssh --info=progress2 --log-file=/home/eliasy/Desktop/backup.log "eliasy@cedro:/home/eliasy/zpool/backup_1/$1" "$2"
 }
 
 
 rsync_to(){
-rsync --ignore-existing --protect-args --partial -azze ssh --info=progress2 --log-file=/home/eliasy/Desktop/backup.log "$1" "eliasy@cedro:/home/eliasy/$2" 
+rsync --protect-args --partial -azze ssh --info=progress2 --log-file=/home/eliasy/Desktop/backup.log "$1" "eliasy@cedro:/home/eliasy/$2" 
 }
 
 rsync_to_zpool(){
-rsync --ignore-existing --protect-args --partial -azze ssh --info=progress2 --log-file=/home/eliasy/Desktop/backup.log "$1" "eliasy@cedro:/home/eliasy/zpool/backup_1/$2" 
+rsync --protect-args --partial -azze ssh --info=progress2 --log-file=/home/eliasy/Desktop/backup.log "$1" "eliasy@cedro:/home/eliasy/zpool/backup_1/$2" 
 }
 
 # fast grep
@@ -221,8 +222,7 @@ p () {
     open=xdg-open   # this will open pdf file withthe default PDF viewer on KDE, xfce, LXDE and perhaps on other desktops.
 
     ag -U -g ".pdf$" \
-    | fast-p \
-    | fzf --read0 --reverse -e -d $'\t'  \
+    | fast-p \ | fzf --read0 --reverse -e -d $'\t'  \
         --preview-window down:80% --preview '
             v=$(echo {q} | tr " " "|"); 
             echo -e {1}"\n"{2} | grep -E "^|$v" -i --color=always;
@@ -246,7 +246,59 @@ vterm_printf(){
 }
 
 fscan(){
-scanimage --device "fujitsu:fi-6140dj:23316" --format=png --progress --source "ADF Duplex" --batch --mode Gray --page-width 210 --page-height 270 --resolution 300
+scanimage --device "fujitsu:fi-6140dj:23316" --format=png --progress --batch=scan%03d.png --source "ADF Duplex" --mode Gray --resolution 300 --page-width 224.85 --page-height 320 --overscan=On  --paper-protect=On --bgcolor=Black --buffermode=On  
+}
+
+fscan_color(){
+scanimage --device "fujitsu:fi-6140dj:23316" --format=png --progress --batch=scan%03d.png --source "ADF Duplex" --mode Color --resolution 300 --page-width 224.85 --page-height 320 --overscan=On  --paper-protect=On --bgcolor=Black --buffermode=On  
+}
+
+# --ald=yes
+#--swdeskew=yes --swdespeck=1 
+#--swcrop=yes
+#--hwdeskewcrop=yes
+
+usbstick(){
+sudo mount /dev/$1 ~/usbstick -o umask=000
+}
+
+magick_resize(){
+mogrify -path $2 -filter Triangle -define filter:support=2 -unsharp 0.25x0.08+8.3+0.045 -dither None -posterize 20 -quality 82 -define jpeg:fancy-upsampling=off -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=1 -define png:exclude-chunk=all -interlace none -colorspace sRGB $1
+} 
+
+magick_resize_png(){
+mogrify -path $2 -filter Triangle -define filter:support=2 -unsharp 0.25x0.08+8.3+0.045 -dither None -posterize 20 -quality 82 -define jpeg:fancy-upsampling=off -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=1 -define png:exclude-chunk=all -interlace none -colorspace sRGB -format png  $1
+} 
+
+fdu(){
+du -h --max-depth=1 | sort -h
+}
+
+fmpv(){ 
+file=$(echo "$1" | sed s:/home/eliasy/cedro/:/home/eliasy/zpool/backup_1/:)
+echo $file
+mpv --volume=20  "sftp://eliasy@cedro$file"
+}
+
+fncmpcpp(){
+# attempts to connect to port
+# if already connect, 
+# only opens ncmpcpp
+# grep -c returns the number of matches
+# anything more than one is true
+ssh_on=$(ss -anl4 | grep -c 127.0.0.1:8000)
+echo "ssh_on=$ssh_on"
+if [[ $ssh_on -eq "0" ]]; 
+then
+ssh -N -L 8000:localhost:80 -L 6601:localhost:6600 eliasy@cedro &>/dev/null &;
+fi
+
+# opens ncmpcpp
+ncmpcpp
 }
 
 
+# To use functions with gnu parallel
+# Activate env_parallel function (can be done in .zshenv)
+. `which env_parallel.zsh`
+ 

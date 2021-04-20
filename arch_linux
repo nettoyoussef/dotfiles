@@ -241,6 +241,7 @@ pacman -S firefox \ # browser
 	  mpd            \ # music player daemon
 	  ncmpcpp        \ # client for mpd
 	  wget           \ # with curl, the best way to download something
+	  zfs            \ # best filesystem ever
 	  flameshot          \ # for screenshots
           ttf-font-awesome
 	  ttf-opensans
@@ -329,6 +330,30 @@ sudo gpasswd -a $USER docker
 systemctl enable docker
 systemctl start docker
 
+# zpool and arch
+
+# to automatically mount the pools on bot you need to give some permissions
+sudo zpool set cachefile=/etc/zfs/zpool.cache name_of_your_pool
+# enable cache and target
+sudo systemctl enable zfs-import-cache
+sudo systemctl enable zfs-import.target
+
+# enable auto mount
+sudo systemctl enable zfs-mount
+sudo systemctl enable zfs.target
+
+# X11 forwarding
+# source:
+# https://wiki.archlinux.org/index.php/OpenSSH#X11_forwarding
+sudo pacma -S xorg-xauth xorg-xhost
+vim /ect/ssh/sshd_config
+# set X11Forwarding to yes
+# verify that AllowTcpForwarding and X11UseLocalhost options are set to yes, and 
+# that X11DisplayOffset is set to 10 (those are the default values if nothing has been changed, see sshd_config(5))
+# restart sshd daemon
+
+
+
 
 # show available shells
 # chsh -l
@@ -368,8 +393,42 @@ yay -Syu       \
      subbotools \ # AEP fits 
      gbutils    \ # Giulio Bottazzi's Command Line Econometrics 
      debtap \ # to convert deb packages to tar for AUR
+     # oh-my-zsh-git \ # best powerline ever - use the installation script below - the git version doesn't work for some reason
+    hfsprogs \ # to format hfs+ (mac) drivers
 
-echo "exec i3-gaps" >> ~/.xinitrc
+##
+# instala oh my zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+##
+# instala powerlevel9k theme para zsh
+git clone https://github.com/bhilburn/powerlevel9k.git ~/.oh-my-zsh/custom/themes/powerlevel9k
+
+
+
+echo "
+# nvidia card
+xrandr --setprovideroutputsource modesetting NVIDIA-0
+xrandr --auto
+
+# enable screenshots with flameshot
+# see bug:
+# https://github.com/lupoDharkael/flameshot/issues/90
+dbus-launch flameshot & 
+
+# tilling window manager
+exec i3
+#exec startplasma-x11
+" >> ~/.xinitrc
+
+
+
+
+
+
+
+
+
 
 # to see which keyboard mappings are available do:
 # xmodmap -pke
@@ -407,13 +466,6 @@ sudo echo "load-module module-echo-cancel aec_method=webrtc" >> /etc/pulse/defau
 # sudo apt-get install alsa-base pulseaudio    
 # depois, va em sounds, allow over-amplification
 
-##
-# instala oh my zsh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-
-##
-# instala powerlevel9k theme para zsh
-git clone https://github.com/bhilburn/powerlevel9k.git ~/.oh-my-zsh/custom/themes/powerlevel9k
 
 
           
