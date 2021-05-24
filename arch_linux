@@ -70,6 +70,12 @@ mount  /dev/sda1      /mnt/home
 # To see all partitions created
 lsblk
 
+# if the pendrive is old you may have problem with invalid keys
+# delete the pacman cache with
+# sudo pacman -Sc
+# update it with -Syy
+# sudo pacman -S archlinux-keyring
+#
 # instalando o arch
 pacstrap /mnt base base-devel linux linux-firmware gvim 
 
