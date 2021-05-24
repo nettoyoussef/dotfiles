@@ -1,0 +1,128 @@
+#################################
+#                               #
+#    main program controls      #
+#                               #
+#################################
+
+# Vim bindings
+# jkhl
+def_key "j"
+    scroll_down
+def_key "k"
+    scroll_up
+def_key "h"
+    previous_column
+def_key "l"
+    next_column
+
+# search
+def_key "/"
+  find
+def_key "/"
+  find_item_forward
+def_key "n"
+    next_found_item
+def_key "N"
+    previous_found_item
+
+# volume
+def_key "="
+    volume_up
+
+def_key "-"
+    volume_down
+
+# play, pause, repeat, quit
+
+def_key "space"
+  play
+
+def_key "p"
+  pause
+
+def_key "0"
+  replay_song
+
+def_key "q"
+  quit
+
+# home, beginning of buffer, end of buffer
+# page up and down
+def_key "g"
+  move_home
+
+def_key "G"
+  move_end
+
+def_key "ctrl-f"
+  page_down
+def_key "ctrl-b"
+  page_up
+
+
+#################################
+#                               #
+#          Playlists            #
+#                               #
+#################################
+
+# Playlists configuration
+# adding, selecting, removing
+def_key "a"
+  add_item_to_playlist
+
+def_key "A"
+  add_selected_items
+
+def_key "d"
+  delete_playlist_items
+
+def_key "delete"
+  delete_playlist_items
+
+def_key "c"
+  clear_playlist
+
+def_key "c"
+  clear_main_playlist
+
+# saving
+def_key "S"
+  save_playlist
+
+# moving
+def_key "K"
+  move_selected_items_up
+
+def_key "J"
+  move_selected_items_down
+
+def_key "m"
+  move_sort_order_up
+
+def_key "n"
+  move_sort_order_down
+
+def_key "delete"
+  delete_browser_items
+
+def_key "delete"
+  delete_stored_playlist
+
+#################################
+#                               #
+#            Other              #
+#                               #
+#################################
+
+def_key "+"
+    show_clock
+
+def_key "."
+    show_lyrics
+
+# not used but bound
+def_key "J"
+    move_sort_order_down
+def_key "K"
+    move_sort_order_up
