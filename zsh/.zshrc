@@ -1,3 +1,18 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+
+###############################################################
+#                                                             #
+#                     Zsh Main Configuration                  #
+#                                                             #
+###############################################################
+
+
 ## fix for tramp
 # https://emacs.stackexchange.com/questions/47969/trouble-connecting-gnu-emacs-to-work-machine-through-ssh-tramp?rq=1
 if [[ "$TERM" == "dumb" ]]; then
@@ -11,127 +26,17 @@ if [[ "$TERM" == "dumb" ]]; then
 fi
 
 
-# Path to your oh-my-zsh installation.
+# Path to my oh-my-zsh installation.
 export ZSH="/home/eliasy/.oh-my-zsh"
 export TERM="xterm-256color"
 
-# Set name of the theme to load --- if set to "random", it will
-# load a random theme each time oh-my-zsh is loaded, in which case,
-# to know which specific one was loaded, run: echo $RANDOM_THEME
-# See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
-#ZSH_THEME="nebirhos"
-ZSH_THEME="powerlevel9k/powerlevel9k"
-POWERLEVEL9K_MODE="nerdfont-complete"
-
-#POWERLEVEL9K_DISABLE_RPROMPT=true
-POWERLEVEL9K_PROMPT_ON_NEWLINE=true
-POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="▶ "
-POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=""
-
-#Para adicionar uma linha entre prompts
-POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
-
-#Para alterar a home para um icone
-POWERLEVEL9K_CUSTOM_FLAME_ICON="echo "
-POWERLEVEL9K_CUSTOM_FLAME_ICON_BACKGROUND=069
-POWERLEVEL9K_CUSTOM_FLAME_ICON_FOREGROUND=015
-
-#CONTEXT displays username/hostname
-#DIR displays the current working directory, that we can even trim path if we want!
-#tirei context dai pra nao ficar muito poluido
-POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context custom_flame_icon dir vcs)
-
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Use ~~ as the trigger sequence instead of the default **
-export FZF_COMPLETION_TRIGGER='**'
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-# Which plugins would you like to load?
-# Standard plugins can be found in ~/.oh-my-zsh/plugins/*
-# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-plugins=(git docker docker-compose fzf)
-
-source $ZSH/oh-my-zsh.sh
-
-# User configuration
-# ssh
-# export SSH_KEY_PATH="~/.ssh/rsa_id"
-
-#Postgresql - mudanca de diretorios
-export PGHOST=localhost
-
-# necessario para fazer o kdeconnect funcionar
-export QT_QPA_PLATFORMTHEME=qt5ct
-
-# files
-alias r="ranger"
-alias vimrc="vim ~/project_repositories/dotfiles/vim/.vimrc"
-alias zshrc="vim ~/project_repositories/dotfiles/zsh/.zshrc"
-#alias tmux.conf='vim ~/.tmux.conf'
-alias i3='vim ~/project_repositories/dotfiles/i3/i3.config'
-alias arch='vim ~/project_repositories/dotfiles/arch_linux'
-alias zathurarc='vim ~/project_repositories/dotfiles/zathurarc'
-alias rc='vim ~/project_repositories/dotfiles/ranger/rc.conf'
-alias rifle='vim ~/project_repositories/dotfiles/ranger/rifle.conf'
-alias py='source ~/eliasy_env/bin/activate; python'
-alias cedro_tunnel='ssh -L localhost:9000:localhost:8787 eliasy@cedro.lbic.fee.unicamp.br'
-alias transcribe='wine "/home/eliasy/.wine/drive_c/Program Files (x86)/Transcribe!/Transcribe.exe"'
-
-#Configuracao do Gurobi
-export GUROBI_HOME="/opt/gurobi811/linux64"
-export PATH="${PATH}:${GUROBI_HOME}/bin"
-export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${GUROBI_HOME}/lib"
-
-#Configuracao texlive
-export PATH=/usr/local/texlive/2019/bin/x86_64-linux:$PATH
-
-#Configuracao ranger
-export EDITOR=vim
-#export TERMCMD=konsole
-export TERMCMD=gnome-terminal
-alias ranger='ranger' # --choosedir = /home/eliasy/'
-
-# Blocks telemetry from Microsoft on VScode
-export DOTNET_CLI_TELEMETRY_OPTOUT=1
-
-
-# softwares
-alias yt='youtube-dl'
-
-# make autojump work
-[[ -s /home/eliasy/.autojump/etc/profile.d/autojump.sh ]] && source /home/eliasy/.autojump/etc/profile.d/autojump.sh 
-
-#######################################
-#User defined functions
-#these functions allow the user to use widgets made by the community
-#In my case, I opt to be able to edit the command line with vim like 
-#codding.
-
-# vi mode
-bindkey -v
-#export KEYTIMEOUT=1
-#outro formato, escolhendo qual a tecla altera para normal mode
-#bindkey 'jk' vi-cmd-mode #aqui voce usa jk para entrar no normal mode
-
-# Use vim keys in tab complete menu:
-bindkey -M menuselect 'h' vi-backward-char
-bindkey -M menuselect 'k' vi-up-line-or-history
-bindkey -M menuselect 'l' vi-forward-char
-bindkey -M menuselect 'j' vi-down-line-or-history
-bindkey -v '^?' backward-delete-char
-
-# Edit line in vim with ctrl-e:
-autoload edit-command-line; zle -N edit-command-line
-bindkey '^e' edit-command-line
-
-### autoload
-
 #Enabling command completion
+### autoload
 autoload -U compinit
+zstyle ':completion:*' menu yes 
+zmodload zsh/complist
+# Include hidden files on autocomplete
+comp_options+=(globdots)		
 compinit
 
 ### set opt
@@ -168,19 +73,121 @@ setopt listtypes
 #zle -N no-magic-abbrev-expand
 
 
+###############################################################
+#                                                             #
+#                     Alias and Software                      #
+#                        Configuration                        #
+#                                                             #
+###############################################################
+
+# User configuration
+# ssh
+# export SSH_KEY_PATH="~/.ssh/rsa_id"
+
+#Postgresql - mudanca de diretorios
+export PGHOST=localhost
+
+# necessario para fazer o kdeconnect funcionar
+export QT_QPA_PLATFORMTHEME=qt5ct
+
+# files
+alias r="ranger"
+alias vimrc="vim ~/project_repositories/dotfiles/vim/.vimrc"
+alias zshrc="vim ~/project_repositories/dotfiles/zsh/.zshrc"
+#alias tmux.conf='vim ~/.tmux.conf'
+alias i3='vim ~/project_repositories/dotfiles/i3/i3.config'
+alias arch='vim ~/project_repositories/dotfiles/arch_linux'
+alias zathurarc='vim ~/project_repositories/dotfiles/zathurarc'
+alias rc='vim ~/project_repositories/dotfiles/ranger/rc.conf'
+alias rifle='vim ~/project_repositories/dotfiles/ranger/rifle.conf'
+alias py='source ~/eliasy_env/bin/activate; python'
+alias cedro_tunnel='ssh -L localhost:9000:localhost:8787 eliasy@cedro.lbic.fee.unicamp.br'
+alias transcribe='wine "/home/eliasy/.wine/drive_c/Program Files (x86)/Transcribe!/Transcribe.exe"'
+alias kdeconnect='/usr/lib/kdeconnectd'
 
 
-##
-# pywal colors for the terminal
-# Import colorscheme from 'wal' asynchronously
-# &   # Run the process in the background.
-# ( ) # Hide shell job control messages.
+#Configuracao do Gurobi
+export GUROBI_HOME="/opt/gurobi811/linux64"
+export PATH="${PATH}:${GUROBI_HOME}/bin"
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${GUROBI_HOME}/lib"
 
+#Configuracao texlive
+export PATH=/usr/local/texlive/2019/bin/x86_64-linux:$PATH
+
+#Configuracao ranger
+export EDITOR=vim
+#export TERMCMD=konsole
+export TERMCMD=gnome-terminal
+alias ranger='ranger' # --choosedir = /home/eliasy/'
+
+# Blocks telemetry from Microsoft on VScode
+export DOTNET_CLI_TELEMETRY_OPTOUT=1
+
+
+# softwares
+alias yt='youtube-dl'
+
+# make autojump work
+[[ -s /home/eliasy/.autojump/etc/profile.d/autojump.sh ]] && source /home/eliasy/.autojump/etc/profile.d/autojump.sh 
+
+# To use functions with gnu parallel
+# Activate env_parallel function (can be done in .zshenv)
+. `which env_parallel.zsh`
+
+# Fzf configuration 
+# Use , as the trigger sequence instead of the default **
+export FZF_COMPLETION_TRIGGER=','
+# source the fzf functions
+source /usr/share/fzf/key-bindings.zsh
+source /usr/share/fzf/completion.zsh
+export FZF_BASE=/usr/share/fzf
+export DISABLE_FZF_KEY_BINDINGS="false"
+export FZF_DEFAULT_COMMAND='rg --hidden'
+
+###############################################################
+#                                                             #
+#                     Oh-My-Zsh Theme and                     #
+#                        Configuration                        #
+#                                                             #
+###############################################################
+
+# Set name of the theme to load --- if set to "random", it will
+# load a random theme each time oh-my-zsh is loaded, in which case,
+# to know which specific one was loaded, run: echo $RANDOM_THEME
+# See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
+#ZSH_THEME="nebirhos"
+ZSH_THEME="powerlevel10k/powerlevel10k"
+
+# Which plugins would you like to load?
+# Standard plugins can be found in ~/.oh-my-zsh/plugins/*
+# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
+# Example format: plugins=(rails git textmate ruby lighthouse)
+# Add wisely, as too many plugins slow down shell startup.
+plugins=(
+	colored-man-pages # add color to man pages
+	command-not-found # tries to find the package of commands not found
+	docker 
+	docker-compose  
+	extract # stop learning the nonsense of tar, zip, 7z etc
+	fzf
+	# git - prefer to use magit
+	safe-paste # avoid pasting code that automatically runs
+)
+
+#########
+# all commands related to plugins to oh-my-zsh must come before this line
+source $ZSH/oh-my-zsh.sh
 
 # Add local 'pip' to PATH:
 # (In your .bashrc, .zshrc etc)
 export PATH="${PATH}:${HOME}/.local/bin/"
 
+
+# Add pywall color support
+# pywal colors for the terminal
+# Import colorscheme from 'wal' asynchronously
+# &   # Run the process in the background.
+# ( ) # Hide shell job control messages.
 (cat ~/.cache/wal/sequences &)
 
 # Alternative (blocks terminal for 0-3ms)
@@ -191,7 +198,43 @@ source ~/.cache/wal/colors-tty.sh
 ##
 
 
-# Functions
+
+###############################################################
+#                                                             #
+#                        Custom Bindings                      #
+#                                                             #
+###############################################################
+
+#User defined functions
+#these functions allow the user to use widgets made by the community
+#In my case, I opt to be able to edit the command line with vim like 
+#codding.
+
+# vi mode
+bindkey -v
+#export KEYTIMEOUT=1
+#outro formato, escolhendo qual a tecla altera para normal mode
+#bindkey 'jk' vi-cmd-mode #aqui voce usa jk para entrar no normal mode
+
+# Use vim keys in tab complete menu:
+# this and other ideas copied from luke smith 
+# https://github.com/LukeSmithxyz/voidrice/blob/master/.config/zsh/.zshrc
+bindkey -M menuselect 'h' vi-backward-char
+bindkey -M menuselect 'k' vi-up-line-or-history
+bindkey -M menuselect 'l' vi-forward-char
+bindkey -M menuselect 'j' vi-down-line-or-history
+bindkey -v '^?' backward-delete-char
+
+# Edit line in vim with ctrl-e:
+autoload edit-command-line; zle -N edit-command-line
+bindkey '^e' edit-command-line
+
+
+###############################################################
+#                                                             #
+#                        Custom Functions                     #
+#                                                             #
+###############################################################
 
 # Rsync fast
 rsync_from(){
@@ -213,8 +256,8 @@ rsync --protect-args --partial -azze ssh --info=progress2 --log-file=/home/elias
 }
 
 # fast grep
-fgrep(){
-find ./ -print0 | xargs -0 -r grep -s "$1"
+fastgrep(){
+find ./ -print0 | xargs -0 -r rg -s "$1"
 }
 
 # Scan pdfs fast
@@ -293,12 +336,54 @@ then
 ssh -N -L 8000:localhost:80 -L 6601:localhost:6600 eliasy@cedro &>/dev/null &;
 fi
 
+# opens mpd 
+mpd &
+
 # opens ncmpcpp
 ncmpcpp
 }
 
+kbd_color(){
+sudo kbd-backlight $1 ~/project_repositories/dotfiles/kbd-backlight-config/config
+}
 
-# To use functions with gnu parallel
-# Activate env_parallel function (can be done in .zshenv)
-. `which env_parallel.zsh`
- 
+
+ffmpeg_instagram(){
+
+ffmpeg -i $1 -vf scale=640:-1,setsar=1 -c:v libx264 -preset slow -profile:v main -level 3.1 -pix_fmt yuv420p -r 30000/1001 -c:a aac -strict experimental -ar 44100 -ac 1 -b:a 64k -movflags +faststart $2 
+
+}
+
+
+ffmpeg_instagram_gray(){
+
+ffmpeg -i $1 -vf format=gray,scale=640:-1,setsar=1 -c:v libx264 -preset slow -profile:v main -level 3.1 -pix_fmt yuv420p -r 30000/1001 -c:a aac -strict experimental -ar 44100 -ac 1 -b:a 64k -movflags +faststart $2 
+
+}
+
+ffmpeg_cut(){
+ffmpeg -i $1 -ss $2 -to $3 $4 
+}
+
+magick_instagram(){
+# width 1080 - height is between 566 and 1350 - if not, stretched or shrunk
+# height 1080 - width is between 320 and 1080 - if not, stretched or shrunk
+# A lot of people say you export in the ratio you want to upload the photo (4x5, 1x1, 3x4 etc. I suggest you stick to 1x1 or 4x5 as this is the most common ratio and with the 4x5 ratio your post takes up the largest amount of space available on Instagram which means more people will see it on the explore page rather than a small 16x9 landscape. Furthermore export your photo as jpeg with a width of 1080 pixel (height should be resized automatically). At last make sure your photo is not larger as roughly 700kb. If it is you can reduce the quality in the export section to about 75%. I haven't figured out yet which file size Instagram allows without reducing the photo quality with its own (shitty) algorithm, but about 700kb seems to be right.
+# Last thing if you upload real photos you can sharpen them with a high pass filter in Photoshop before uploading them. There are heaps of tutorials available.
+
+
+}
+
+
+
+
+
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# Load the zsh syntax highlighting package; should be last line.
+# to install it on arch, just do
+# sudo pacman -S zsh-syntax-highlighting
+source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+

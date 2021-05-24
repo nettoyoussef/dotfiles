@@ -1,0 +1,1 @@
+/home/eliasy/.p10k.zsh
