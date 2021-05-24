@@ -7,7 +7,7 @@ killall -q picom
 while pgrep -u $UID -x picom  >/dev/null; do sleep 1; done
 
 # Launch compton in background, using default config location ~/.config/compton/compton.conf
-picom -b --experimental-backends --config $HOME/dotfiles/picom/picom.conf 
+picom -b --experimental-backends --config /home/eliasy/project_repositories/dotfiles/picom/picom.conf
 #picom -b --config $HOME/dotfiles/picom/picom.conf
 
 echo "picom launched..."
