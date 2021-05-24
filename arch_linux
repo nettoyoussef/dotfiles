@@ -11,6 +11,40 @@ ip link
 
 #Check internet connection
 ping google.com
+# if not working
+# see if the modules are on
+# if it is working, just go to 
+# internet ok, below 
+
+# first get the name of the driver with
+ lspci -v | vim -
+# Ethernet controller....
+# kernel driver in use: r8169
+
+# check if the driver is loaded
+ dmseg | grep r8169
+
+# next see if the device is ok
+ ip linkn show 
+
+# see ip addresses
+ip address show
+
+# add fixed ip address
+# an example below
+ip address add 143.106.45.175/27 dev enp4s0
+
+# add gateway
+ip route add default via 143.106.45.161 dev enp4s0
+
+# add DNS for first internet access
+# configure by editing the /etc/resolv.conf
+# add the lines
+nameserver 143.106.8.29
+nameserver 143.106.8.30
+
+# for fixed ip, wired connections
+nmcli con mod "Wired connection 1" ipv4.addresses "143.106.45.170/27" ipv4.gateway "143.106.45.161" ipv4.dns "143.106.8.29,143.106.8.30" ipv4.method "manual"
 
 # organiza conexao wifi
 wifi-menu
@@ -23,7 +57,7 @@ fdisk -l
 # formata a particao no file system escolhido - checar o caminho do disco
 mkfs.ext4 /dev/nvme0n1p3
 
-
+# internet ok
 # Para criar particoes numa instalacao virgem
 # fdisk /path/to/hardware (normalmente /dev/sda1)
 # n - cria nova particao
