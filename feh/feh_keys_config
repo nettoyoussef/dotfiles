@@ -7,6 +7,11 @@
 # Each <key> is an X11 keysym (as output by xev) with optional modifier.
 # For instance, C-x would be Ctrl+X, or 4-space Mod4+Space
 
+# see complete list of key events on file /src/keyevents.c
+# on 
+# https://github.com/derf/feh/blob/9642354668f0555f125a6684a63d7ec30c427960/src/keyevents.c
+# cryptic to find what command does what
+
 # Examples for vim-like menu bindings on a qwerty keyboard:
 menu_parent h Left
 menu_child  l Right
@@ -17,6 +22,12 @@ menu_select space Return
 # Same for image navigation ...
 next_img j Right space
 prev_img k Left BackSpace
+
+# rotate image
+# counterclockwise
+#orient_3 <  
+# clockwise
+#orient_1 >  
 
 # and image movement
 scroll_up    J C-Up
