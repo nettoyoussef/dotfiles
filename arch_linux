@@ -366,7 +366,7 @@ sudo systemctl enable zfs.target
 # X11 forwarding
 # source:
 # https://wiki.archlinux.org/index.php/OpenSSH#X11_forwarding
-sudo pacma -S xorg-xauth xorg-xhost
+sudo pacman -S xorg-xauth xorg-xhost
 vim /ect/ssh/sshd_config
 # set X11Forwarding to yes
 # verify that AllowTcpForwarding and X11UseLocalhost options are set to yes, and 
