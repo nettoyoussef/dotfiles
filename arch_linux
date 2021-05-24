@@ -1,3 +1,9 @@
+
+# see if the correct keyboard configuration is used
+# localectl list-keymaps
+# then load it with
+# loadkeys br-abnt2
+
 # check network interface
 ip link
 
@@ -24,6 +30,12 @@ mkfs.ext4 /dev/nvme0n1p3
 # p - transforma particao em primaria
 # escolha tamanho das particoes usando: + tamanho unidade. Ex: +10G.
 # No final, salve usando: w
+
+# 1 particao / - 60G
+# 1 particao /swap - 4G
+# 1 particao /uefi - 1G
+# 1 particao /home - resto
+
 
 # Depois monte e aloque cada uma das particoes.
 # 1) formate e escolha sistema de arquivos:
