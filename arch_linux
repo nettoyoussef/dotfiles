@@ -187,8 +187,10 @@ pacman -S nvidia-dkms nvidia-libgl mesa # apparently dkms recompiles with every 
 pacman -S firefox \ # browser
 	  libinput \ # to control touchpad smartly
           alsa-utils \ # audio driver
-	  zsh \
-	  git \
+	  zsh \ # the ultimate shell
+	  zsh-syntax-highlighting \ # provides color context for commands
+	  git \ # the almighty version control system
+          git-filter-repo \ # useful tool for rewriting history on git repositories
 	  curl \
 	  zathura zathura-djvu \ # djvu reader
 	  #zathura-pdf-mupdf \ # pdf reader using the mupdf engine - currently presents some search problems in some pdfs - see https://git.pwmt.org/pwmt/zathura/issues/126
