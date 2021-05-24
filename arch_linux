@@ -225,7 +225,8 @@ pacman -S firefox \ # browser
 	  feh            \ # wallpaper setter
 	  python-pywal   \ # sets colors in terminal according to wallpaper
 	  arandr         \ # GUI program to set multiple monitors
-          picom          \ # is for transparency and removing screen-tearing.
+          #picom          \ # for transparency and removing screen-tearing.
+	  # use the aur fork picom-ibhagwan-git instead
           ranger         \ # is an extensive terminal file manager that everyone likes.
 	  w3m            \ # preview images in Ranger
 	  \ # end
@@ -386,6 +387,7 @@ yay -Syu       \
      # basically, you have to do: yay -S polybar
      # details:
      # https://github.com/polybar/polybar/issues/885
+     picom-ibhagwan-git \  # for transparency and removing screen-tearing.
      autojump       \ # move to directory faster in ranger or cli
      timeshift      \ # automate system backups to avoid downtime
      nvidia-container-toolkit \ # needed to run docker on gpus
