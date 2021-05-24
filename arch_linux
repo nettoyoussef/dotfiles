@@ -395,6 +395,7 @@ yay -Syu       \
      debtap \ # to convert deb packages to tar for AUR
      # oh-my-zsh-git \ # best powerline ever - use the installation script below - the git version doesn't work for some reason
     hfsprogs \ # to format hfs+ (mac) drivers
+    nerd-fonts-meslo-p10k \ # recommended font for powerlevel10k
 
 ##
 # instala oh my zsh
@@ -402,7 +403,10 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 
 ##
 # instala powerlevel9k theme para zsh
-git clone https://github.com/bhilburn/powerlevel9k.git ~/.oh-my-zsh/custom/themes/powerlevel9k
+# git clone https://github.com/bhilburn/powerlevel9k.git ~/.oh-my-zsh/custom/themes/powerlevel9k
+
+# instala powerlevel10k theme para zsh
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
 
 
 
