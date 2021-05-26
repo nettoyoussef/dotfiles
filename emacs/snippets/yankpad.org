@@ -1,6 +1,6 @@
 * Latex Snippets
 
-Most converted from Gilles Castel's useful [[list][https://github.com/gillescastel/latex-snippets/blob/master/tex.snippets]].
+Most converted from Gilles Castel's useful [[https://github.com/gillescastel/latex-snippets/blob/master/tex.snippets][list]].
 
 ** ...:   "ldots"
 \ldots
