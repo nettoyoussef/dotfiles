@@ -1,0 +1,597 @@
+* Cemitery - disabled config
+** Tabs with Centaur Tabs
+
+#+BEGIN_SRC emacs-lisp   
+;;(use-package centaur-tabs
+;;  :ensure t
+;;  :demand
+;;  :hook
+;;  (inferior-ess-mode . centaur-tabs-local-mode)
+;;  :config
+;;  (centaur-tabs-mode t)
+;;  (setq centaur-tabs-set-icons t)            ;; add icons to tabs
+;;  (setq centaur-tabs-gray-out-icons 'buffer) ;; gray-out icons from unselected tabs
+;;  (setq centaur-tabs-set-bar 'over)          ;; add a line over the current tab
+;;  (setq centaur-tabs-set-close-button nil)   ;; remove close buttom
+;;  (setq centaur-tabs-set-modified-marker t)  ;; add symbol for modified buffers
+;;  (setq centaur-tabs-modified-marker "•")    ;; set symbol for modified buffer
+;;  :bind
+;;  ("C-<prior>" . centaur-tabs-backward)
+;;  ("C-<next>" . centaur-tabs-forward)
+;;)
+#+END_SRC
+** Tabs with Emacs default support
+source: https://github.com/andreyorst/dotfiles/blob/master/.config/emacs/README.org#tabline
+#+BEGIN_SRC emacs-lisp   
+;;(defvar aorst--line-pixel-height (line-pixel-height)
+;;  "Line height in pixels.
+;;Used in various places to avoid getting wrong line height when
+;;`text-scale-mode' is active.")
+;;
+;;(use-package tab-line
+;; ;; :straight nil
+;;  :unless (version< emacs-version "27")
+;;  :hook ((after-init . global-tab-line-mode)
+;;         ((aorst--load-theme
+;;           aorst--disable-theme
+;;           aorst--solaire-swap-bg) . aorst/tabline-setup-faces))
+;;  :bind
+;;  ("C-<prior>" . tab-line-switch-to-prev-tab)
+;;  ("C-<next>" . tab-line-switch-to-next-tab)
+;;  :config
+;;  (defun tab-line-close-tab (&optional e)
+;;    "Close the selected tab.
+;;
+;;If tab is presented in another window, close the tab by using
+;;`bury-buffer` function.  If tab is unique to all existing
+;;windows, kill the buffer with `kill-buffer` function.  Lastly, if
+;;no tabs left in the window, it is deleted with `delete-window`
+;;function."
+;;    (interactive "e")
+;;    (let* ((posnp (event-start e))
+;;           (window (posn-window posnp))
+;;           (buffer (get-pos-property 1 'tab (car (posn-string posnp)))))
+;;      (with-selected-window window
+;;        (let ((tab-list (tab-line-tabs-window-buffers))
+;;              (buffer-list (flatten-list
+;;                            (seq-reduce (lambda (list window)
+;;                                          (select-window window t)
+;;                                          (cons (tab-line-tabs-window-buffers) list))
+;;                                        (window-list) nil))))
+;;          (select-window window)
+;;          (if (> (seq-count (lambda (b) (eq b buffer)) buffer-list) 1)
+;;              (progn
+;;                (if (eq buffer (current-buffer))
+;;                    (bury-buffer)
+;;                  (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
+;;                  (set-window-next-buffers window (delq buffer (window-next-buffers))))
+;;                (unless (cdr tab-list)
+;;                  (ignore-errors (delete-window window))))
+;;            (and (kill-buffer buffer)
+;;                 (unless (cdr tab-list)
+;;                   (ignore-errors (delete-window window)))))))))
+;;
+;;
+;;  (defcustom tab-line-tab-min-width 10
+;;    "Minimum width of a tab in characters."
+;;    :type 'integer
+;;    :group 'tab-line)
+;;
+;;  (defcustom tab-line-tab-max-width 20
+;;    "Maximum width of a tab in characters."
+;;    :type 'integer
+;;    :group 'tab-line)
+;;
+;;  (defcustom tab-line-ellipsis-string "…"
+;;    "String for indicating truncated names"
+;;    :type 'string
+;;    :group 'tab-line)
+;;
+;;  (defun aorst/tab-line--tab-width (window-width tab-amount)
+;;    "Calculate width of single tab dividing WINDOW-WIDTH by TAB-AMOUNT."
+;;    (let* ((close-button-size
+;;            (if tab-line-close-button-show
+;;                (length (substring-no-properties tab-line-close-button)) 0))
+;;           (tab-width (/ window-width tab-amount)))
+;;      (- (cond ((< window-width 0)
+;;                tab-line-tab-min-width)
+;;               ((>= tab-width tab-line-tab-max-width)
+;;                tab-line-tab-max-width)
+;;               ((< tab-width tab-line-tab-min-width)
+;;                tab-line-tab-min-width)
+;;               (t tab-width))
+;;         close-button-size)))
+;;
+;;  (defun aorst/tab-line--max-width (window)
+;;    "Calculate free width of the WINDOW.
+;;
+;;Free width means amount of space we can use to display tabs
+;;without truncation."
+;;    (- (window-width window)
+;;       (length (substring-no-properties tab-line-left-button))
+;;       (length (substring-no-properties tab-line-right-button))
+;;       (if tab-line-new-button-show
+;;           (length (substring-no-properties tab-line-new-button))
+;;         0)))
+;;
+;;
+;;  (defun aorst/tab-line--make-pad (tab-width name-width)
+;;    "Generate padding string based on TAB-WIDTH and NAME-WIDTH."
+;;    (let* ((width (- tab-width name-width))
+;;           (padding (/ (if (oddp width) (+ width 1) width) 2)))
+;;      (make-string padding ?\s)))
+;;
+;;
+;;  (defun aorst/tab-line-name-buffer (buffer &rest _buffers)
+;;    "Create name for tab with padding and truncation.
+;;
+;;If buffer name is shorter than `tab-line-tab-max-width' it gets
+;;centered with spaces, otherwise it is truncated, to preserve
+;;equal width for all tabs.  This function also tries to fit as
+;;many tabs in window as possible, so if there are no room for tabs
+;;with maximum width, it calculates new width for each tab and
+;;truncates text if needed.  Minimal width can be set with
+;;`tab-line-tab-min-width' variable."
+;;    (with-current-buffer buffer
+;;      (let* ((amount (length (tab-line-tabs-window-buffers)))
+;;             (width (aorst/tab-line--tab-width
+;;                     (aorst/tab-line--max-width (get-buffer-window buffer))
+;;                     amount))
+;;             (buffer (string-trim (buffer-name)))
+;;             (name-width (length buffer))
+;;             (right-pad (if tab-line-close-button-show "" " "))
+;;             (truncate-width (- width
+;;                                (length tab-line-ellipsis-string)
+;;                                (length right-pad)
+;;                                1)))
+;;        (if (>= name-width truncate-width)
+;;            (propertize (concat  " " (truncate-string-to-width buffer truncate-width) tab-line-ellipsis-string right-pad)
+;;                        'help-echo (if-let ((name (buffer-file-name)))
+;;                                       (abbreviate-file-name name)
+;;                                     (buffer-name)))
+;;          (let* ((padding (aorst/tab-line--make-pad width name-width))
+;;                 (tab-text (concat padding buffer))
+;;                 (text-width (length tab-text)))
+;;            (propertize (concat tab-text (make-string (- width text-width) ?\s))
+;;                        'help-echo (when-let ((name (buffer-file-name)))
+;;                                    (abbreviate-file-name name))))))))
+;;
+;;
+;;
+;;  (setq tab-line-close-button-show nil ; remove close button "x" 
+;;        tab-line-new-button-show nil ; remove new buttom "+"
+;;        tab-line-separator ""
+;;        tab-line-tab-name-function #'aorst/tab-line-name-buffer
+;;        tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
+;;                                          'keymap tab-line-right-map
+;;                                          'mouse-face 'tab-line-highlight
+;;                                          'help-echo "Click to scroll right")
+;;        tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
+;;                                         'keymap tab-line-left-map
+;;                                         'mouse-face 'tab-line-highlight
+;;                                         'help-echo "Click to scroll left")
+;;        tab-line-close-button (propertize (if (char-displayable-p ?×) " × " " x ")
+;;                                          'keymap tab-line-tab-close-map
+;;                                          'mouse-face 'tab-line-close-highlight
+;;                                          'help-echo "Click to close tab")
+;;        tab-line-exclude-modes '(ediff-mode
+;;                                 process-menu-mode
+;;                                 term-mode
+;;                                 vterm-mode
+;;                                 treemacs-mode))
+;;
+;;
+;;  (defun aorst/tabline-setup-faces ()
+;;    (let ((bg (if (and (facep 'solaire-default-face)
+;;                       (not (eq (face-attribute 'solaire-default-face :background)
+;;                                'unspecified)))
+;;                  (face-attribute 'solaire-default-face :background)
+;;                (face-attribute 'default :background)))
+;;          (fg (face-attribute 'default :foreground))
+;;          (dark-fg (face-attribute 'shadow :foreground))
+;;          (base (if (and (facep 'solaire-default-face)
+;;                         (not (eq (face-attribute 'solaire-default-face :background)
+;;                                  'unspecified)))
+;;                    (face-attribute 'default :background)
+;;                  (face-attribute 'mode-line :background)))
+;;          (box-width (/ aorst--line-pixel-height 2)))
+;;      (set-face-attribute 'tab-line nil
+;;                          :background base
+;;                          :foreground dark-fg
+;;                          :height 1.0
+;;                          :inherit nil
+;;                          :box (when (> box-width 0) (list :line-width -1 :color base)))
+;;      (set-face-attribute 'tab-line-tab nil
+;;                          :foreground dark-fg
+;;                          :background bg
+;;                          :weight 'normal
+;;                          :inherit nil
+;;                          :box (when (> box-width 0) (list :line-width box-width :color bg)))
+;;      (set-face-attribute 'tab-line-tab-inactive nil
+;;                          :foreground dark-fg
+;;                          :background base
+;;                          :weight 'normal
+;;                          :inherit nil
+;;                          :box (when (> box-width 0) (list :line-width box-width :color base)))
+;;      (set-face-attribute 'tab-line-tab-current nil
+;;                          :foreground fg
+;;                          :background bg
+;;                          :weight 'normal
+;;                          :inherit nil
+;;                          :box (when (> box-width 0) (list :line-width box-width :color bg)))))
+;;
+;;  (aorst/tabline-setup-faces)
+;;
+;;  (defun aorst/tab-line-drop-caches ()
+;;    "Drops `tab-line' cache in every window."
+;;    (dolist (window (window-list))
+;;      (set-window-parameter window 'tab-line-cache nil)))
+;;
+;;  (add-hook 'window-configuration-change-hook #'aorst/tab-line-drop-caches)
+;;
+;;  (define-advice tab-line-select-tab (:after (&optional e) aorst:tab-line-select-tab)
+;;    (select-window (posn-window (event-start e)))))
+#+END_SRC
+** add quelpa and quelpa-use-package to load packages from github (disabled)
+
+I used this to download and install a package from github and test an issue (frames-only-mode bug with org-latex-preview).
+(After resolving the issue above, I disabilitated those packages).
+#+BEGIN_SRC emacs-lisp    
+;;(use-package quelpa 
+;;  :ensure t 
+;;  :config
+;;  (setq quelpa-update-melpa-p nil)
+;;  ;;(setq quelpa-checkout-melpa-p nil)
+;;)              
+;;
+;;(use-package quelpa-use-package
+;;  :ensure t 
+;;)
+#+END_SRC
+
+** CDLatex (code snippets for latex) (disabled)
+
+ #+BEGIN_SRC emacs-lisp   
+ ;;(use-package cdlatex 
+ ;;  :ensure t
+ ;;  :defer t
+ ;;  :config
+ ;; )
+ #+END_SRC
+
+** Emacs Configuration
+*** Disable El-doc
+
+ #+BEGIN_SRC emacs-lisp    
+ ;;(global-eldoc-mode -1)
+ #+END_SRC
+
+** Org-mode configuration
+*** Export to word using ox-word.el
+
+#+BEGIN_SRC emacs-lisp   
+(use-package ox-word
+  :after (:all org-ref ox)
+  :demand t
+  :straight (ox-word :type git
+                     :host github
+                     :repo "jkitchin/scimax"
+                     :files ("ox-word.el")))
+#+END_SRC
+
+*** Change latex symbols to utf8 (conceal - substitute tex for symbols)
+Since I started using the org-fragtog-mode I stopped using this. 
+Their version is less cumbersome.
+#+BEGIN_SRC emacs-lisp   
+;(setq org-pretty-entities t)
+#+END_SRC
+*** Make org open files using default apps (disabled)
+
+#+BEGIN_SRC emacs-lisp   
+;; open docx files in default application (ie msword)
+;;(setq org-file-apps
+;;      '(("\\.docx\\'" . default)
+;;        ("\\.x?html?\\'" . default)
+;;        ("\\.pdf\\'" . default)
+;;        (auto-mode . emacs)))
+#+END_SRC
+
+*** Add pandoc library to export docx (disabled)
+
+ #+BEGIN_SRC emacs-lisp   
+
+ ;;(use-package ox-pandoc
+ ;;  :ensure t 
+ ;;  :config
+ ;;  (setq org-pandoc-options-for-docx '((standalone . t)))
+ ;;  )
+
+ #+END_SRC
+
+*** Remove messages from dvipng compilation (disabled)
+
+ Source: https://unix.stackexchange.com/questions/19874/prevent-unwanted-buffers-from-opening/152151#152151 
+ Source: https://stackoverflow.com/questions/11043004/emacs-compile-buffer-auto-close
+
+ #+BEGIN_SRC emacs-lisp   
+ ; Removes *Completions* from buffer after you've opened a file.
+ ;(defun kill-latex-preview-window ()
+ ;;  (interactive
+ ;  (let ((buffer "*Org Preview LaTeX Output*"))
+ ;    (if (get-buffer buffer)
+ ;        (progn
+ ;    	(delete-frame (select-frame-by-name buffer))
+ ;    	(kill-buffer buffer)
+ ;        )
+ ;    )
+ ;  )
+ ;)
+ ;
+ ;(add-hook 'post-command-hook 'kill-latex-preview-window )
+ ;(advice-add 'org-latex-preview :after #'kill-latex-preview-window)
+
+ #+END_SRC
+
+*** Org-roam configuration (disabled)
+ #+BEGIN_SRC emacs-lisp   
+ ;;(use-package org-roam
+ ;;  :ensure t
+ ;;  :hook
+ ;;  (after-init . org-roam-mode)
+ ;;  :config
+ ;;  (setq org-roam-directory "~/notes/zettelkasten/")
+ ;;  :bind (:map org-roam-mode-map
+ ;;          (("C-c n l" . org-roam)
+ ;;           ("C-c n f" . org-roam-find-file)
+ ;;           ("C-c n g" . org-roam-graph-show))
+ ;;          :map org-mode-map
+ ;;          (("C-c n i" . org-roam-insert))
+ ;;          (("C-c n I" . org-roam-insert-immediate))))
+ ;;)
+  #+END_SRC
+
+** Auctex installation (disabled)
+
+#+BEGIN_SRC emacs-lisp   
+;; add bullets to org preview
+(use-package auctex
+  :ensure t 
+  :defer t 
+  :config
+  (setq TeX-auto-save t)
+  (setq TeX-parse-self t)
+  (setq-default TeX-master nil)
+
+  (add-hook 'LaTeX-mode-hook 'visual-line-mode)
+  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
+  (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+
+  (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+  (setq reftex-plug-into-AUCTeX t)
+  )
+ #+END_SRC
+
+** PDF (disabled) 
+*** Org-noter installation / interleave (disabled)
+ 
+  #+BEGIN_SRC emacs-lisp   
+  ;;(use-package org-noter
+  ;;  :ensure t 
+  ;;  :init
+  ;;  )
+ 
+  ;;(use-package interleave 
+  ;;  :ensure t 
+  ;;  :init
+  ;;  )
+   #+END_SRC
+
+*** PDF-tools (disabled) 
+  I didn't like the reader inside Emacs, I prefer to keep using Zathura.  
+  #+BEGIN_SRC emacs-lisp   
+  ;;(use-package pdf-tools
+  ;;  :ensure t 
+  ;;  :init
+  ;;  (pdf-loader-install)
+  ;;  )
+  #+END_SRC
+
+** Appearance customization  
+*** Ruler in 80th character
+ #+BEGIN_SRC emacs-lisp   
+ ;(setq display-fill-column-indicator-column 90)
+ #+END_SRC
+*** Toolbars, menus and scroll bars
+
+ I moved this part to early-init.el
+ #+BEGIN_SRC emacs-lisp    
+ ;;(tool-bar-mode -1)   ; no tool bar with icons
+ ;;(scroll-bar-mode -1) ; no scroll bars
+ ;;(menu-bar-mode -1)   ; no menu bar
+ #+END_SRC
+
+*** Frames mode (disabled)
+ Since I started using centaur tabs, the necessity of frames-only-mode decreased a lot.
+ Now, when I open a new buffer, it automatically appears on a new tab.
+ #+BEGIN_SRC emacs-lisp   
+ ;;(use-package frames-only-mode 
+ ;;  ;;:quelpa (frames-only-mode :fetcher github :repo "davidshepherd7/frames-only-mode")
+ ;;  :ensure t
+ ;;  :config
+ ;;  (frames-only-mode 1)
+ ;;)
+  #+END_SRC
+*** Font size (disabled)
+ Source: https://askubuntu.com/questions/23603/how-to-change-font-size-in-emacs
+
+ The default is size/10 (so to have font at size 14 you use height 140).
+
+#+BEGIN_SRC emacs-lisp   
+(set-face-attribute 'default nil :height 120)
+#+END_SRC
+
+*** Word-wrap for long lines (disabled)
+#+BEGIN_SRC emacs-lisp   
+;; sets word-wrap for long lines - very useful in org mode
+;; (setq-default word-wrap t)
+;; (setq-default visual-line-mode t)
+#+END_SRC
+
+** Thesaurus
+*** Merriam-Webster thesaurus (disabled)
+ Disabled because now I use exclusively the SDCV approach. 
+ The MWT is inside it.   
+ #+BEGIN_SRC emacs-lisp   
+ ;;(use-package mw-thesaurus 
+ ;;  :ensure t 
+ ;;  :init
+ ;; )
+ #+END_SRC
+
+** Evil leader configuration (disabled)
+ I migrate the leader key to an hydra.
+ #+BEGIN_SRC emacs-lisp   
+
+ ;;(defun ey--config-evil-leader ()
+ ;; "Configure evil leader mode."
+ ;; (evil-leader/set-leader ",")
+ ;; (evil-leader/set-key
+ ;;   "n"     'make-frame
+ ;;   "TAB" 'yankpad-expand
+ ;;   "."     'buffer-menu
+ ;;   "d"     'kill-this-buffer
+ ;;   "l"     'whitespace-mode       ;; Show invisible characters
+ ;;   "c"     'ey-open-config
+ ;;   "a"     'ey-open-agenda
+ ;;   "t"     'hydra-thesaurus/body
+ ;;   ;; Projectile
+ ;;   "p"     'projectile-commander
+ ;;   "h"     'helm-projectile
+ ;;   "qq"    'delete-window
+ ;;   "qw"    'kill-buffer-and-window
+ ;;   ;; Multiple cursors 
+ ;;   "f"     'hydra-evil-mc/body
+ ;;;    "a"      'org-insert-structure-template
+ ;;  )
+ ;;)
+ ;;(use-package helm-projectile
+ ;;:bind (("C-S-P" . helm-projectile-switch-project)
+ ;;:map evil-normal-state-map
+ ;;("C-p" . helm-projectile))
+
+;;(use-package evil-leader
+;; :after evil
+;; :ensure t
+;; :config
+;; (global-evil-leader-mode 1)
+;; (ey--config-evil-leader)  
+;;)
+ #+end_SRC 
+** Smart use of underscore in ESS
+ Not used since I can use the option to disable underscore change entirely.   
+
+ ;;#+BEGIN_SRC emacs-lisp   
+ ;;(use-package ess-smart-underscore
+ ;;  :ensure t
+ ;;  :config
+ ;; )
+ ;; #+END_SRC
+** Rmarkdown files
+
+Source: 
+https://www.reddit.com/r/rprogramming/comments/d50kzp/have_you_worked_with_emacs_speaks_statistics_ess/
+
+(defun rmd-mode () 
+ "ESS Markdown mode for rmd files" 
+ (interactive) 
+ (setq load-path 
+    (append '("~/.emacs.d/lisp/polymode/" "~/.emacs.d/lisp/polymode/modes") load-path))
+ (require 'poly-R) 
+ (require 'poly-noweb) 
+ (require 'poly-markdown)
+ (poly-markdown+r-mode)) 
+
+** Treemacs - file manager inside emacs
+
+ #+BEGIN_SRC emacs-lisp   
+ ;;(use-package treemacs
+ ;;  :ensure t
+ ;;  :defer t
+ ;;;;      :init
+ ;;      :config
+ ;;      (progn
+ ;;       (setq treemacs-collapse-dirs                 (if treemacs-python-executable 3 0)
+ ;;             treemacs-deferred-git-apply-delay      0.5
+ ;;             treemacs-directory-name-transformer    #'identity
+ ;;             treemacs-display-in-side-window        t
+ ;;             treemacs-eldoc-display                 t
+ ;;             treemacs-file-event-delay              5000
+ ;;             treemacs-file-extension-regex          treemacs-last-period-regex-value
+ ;;             treemacs-file-follow-delay             0.2
+ ;;             treemacs-file-name-transformer         #'identity
+ ;;             treemacs-follow-after-init             t
+ ;;             treemacs-git-command-pipe              ""
+ ;;             treemacs-goto-tag-strategy             'refetch-index
+ ;;             treemacs-indentation                   2
+ ;;             treemacs-indentation-string            " "
+ ;;             treemacs-is-never-other-window         nil
+ ;;             treemacs-max-git-entries               5000
+ ;;             treemacs-missing-project-action        'ask
+ ;;             treemacs-move-forward-on-expand        nil
+ ;;             treemacs-no-png-images                 nil
+ ;;             treemacs-no-delete-other-windows       t
+ ;;             treemacs-project-follow-cleanup        nil
+ ;;             treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+ ;;             treemacs-position                      'left
+ ;;             treemacs-recenter-distance             0.1
+ ;;             treemacs-recenter-after-file-follow    nil
+ ;;             treemacs-recenter-after-tag-follow     nil
+ ;;             treemacs-recenter-after-project-jump   'always
+ ;;             treemacs-recenter-after-project-expand 'on-distance
+ ;;             treemacs-show-cursor                   nil
+ ;;             treemacs-show-hidden-files             t
+ ;;             treemacs-silent-filewatch              nil
+ ;;             treemacs-silent-refresh                nil
+ ;;             treemacs-sorting                       'alphabetic-asc
+ ;;             treemacs-space-between-root-nodes      t
+ ;;             treemacs-tag-follow-cleanup            t
+ ;;             treemacs-tag-follow-delay              1.5
+ ;;             treemacs-user-mode-line-format         nil
+ ;;             treemacs-user-header-line-format       nil
+ ;;             treemacs-width                         35
+ ;;             treemacs-workspace-switch-cleanup      nil)
+ ;;       
+ ;;       ;; The default width and height of the icons is 22 pixels. If you are
+ ;;       ;; using a Hi-DPI display, uncomment this to double the icon size.
+ ;;       ;;(treemacs-resize-icons 44)
+ ;;
+ ;;       (treemacs-follow-mode t)
+ ;;       (treemacs-filewatch-mode t)
+ ;;       (treemacs-fringe-indicator-mode t)
+ ;;       (pcase (cons (not (null (executable-find "git")))
+ ;;	     (not (null treemacs-python-executable)))
+ ;;        (`(t . t)
+ ;;         (treemacs-git-mode 'deferred))
+ ;;        (`(t . _)
+ ;;         (treemacs-git-mode 'simple)))
+ ;;            )
+ ;;            (treemacs-git-mode 'deferred) ;; highlight icons with git
+ ;;          (use-package treemacs-evil
+ ;;            :after treemacs evil
+ ;;            :ensure t)
+ ;;      
+ ;;          (use-package treemacs-projectile
+ ;;            :after treemacs projectile
+ ;;            :ensure t)
+ ;;      
+ ;;          (use-package treemacs-icons-dired
+ ;;            :after treemacs dired
+ ;;            :ensure t
+ ;;            :config (treemacs-icons-dired-mode))
+ ;;      
+ ;;          (use-package treemacs-magit
+ ;;            :after treemacs magit
+ ;;            :ensure t)
+ ;;)
+
+ #+END_SRC
